@@ -104,3 +104,47 @@ Output:
   <circle cx="600" cy="200" r="100" fill="red" stroke="blue" stroke-width="10"/>
 </svg>
 }}}
+
+== Creating a XUL interface ==
+
+Code:
+{{{
+		$xml = $dom->type('xul');
+		#un tabbox
+		$tabbox = $xml->create('tabbox');
+		$tabbox->orient('vertical')->flex('1');
+		$tabs = $tabbox->create('tabs');
+		$tabpanel = $tabbox->create('tabpanels');
+		$tabpanel->flex('1');
+		#adjunto las pestañas:
+		$tabs->create('tab')->label('Google');
+		$tabs->create('tab')->label('PHP.net');
+		$tabs->create('tab')->label('DEVEL');
+		#y el contenido de las pestañas
+		$tabpanel->create('browser')->src('http://www.google.co.ve/');
+		$tabpanel->create('browser')->src('http://www.php.net/');
+		$tabpanel->create('browser')->src('http://www.devel.com.ve/');
+		$xml->title('Prueba de XUL');
+		$dom->render();	
+}}}
+
+
+Output:
+{{{
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/css" href="chrome://global/skin/"?>
+<window xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" id="xulWindow" persist="screenX screenY width height sizemode" xmlns:html="http://www.w3.org/1999/xhtml" title="Prueba de XUL">
+  <tabbox orient="vertical" flex="1">
+    <tabs>
+      <tab label="Google"/>
+      <tab label="PHP.net"/>
+      <tab label="DEVEL"/>
+    </tabs>
+    <tabpanels flex="1">
+      <browser src="http://www.google.co.ve/"/>
+      <browser src="http://www.php.net/"/>
+      <browser src="http://www.devel.com.ve/"/>
+    </tabpanels>
+  </tabbox>
+</window>
+}}}
