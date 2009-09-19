@@ -13,7 +13,7 @@
 /**
  * TDOM: gestor de documentos XML usando el Document Object Model
  * @author Jesus Lara <jesuslarag@gmail.com>
- * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
+ * @license http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
  */
 class tdom {
 
@@ -98,6 +98,10 @@ class tdom {
 
 	public function __call($method, $args) {
 		return call_user_func_array(array($this->_doc, $method), $args);
+	}
+	
+	public function version() {
+		return TDOM_VERSION;
 	}
 }
 ?>
