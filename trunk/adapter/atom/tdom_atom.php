@@ -19,6 +19,7 @@ class tdom_atom extends tdom_xml {
 
 	#tipo de documento (xml)
 	protected $_dom_type = 'xml';
+	protected $_mime = 'application/atom+xml';
 
 	#nombre del nodo base
 	protected $_base_node = 'feed';

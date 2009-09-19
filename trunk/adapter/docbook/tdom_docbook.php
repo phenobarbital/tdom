@@ -16,6 +16,7 @@ class tdom_docbook extends tdom_xml {
 
 	#tipo de documento (xml)
 	protected $_dom_type = 'xml';
+	protected $_mime = 'application/docbook+xml';
 
 	#nombre del nodo base
 	protected $_base_node = '';
@@ -38,6 +39,9 @@ class tdom_docbook extends tdom_xml {
 	protected $use_dtd = true;
 	protected $validate_dtd = false;
 	
+	#personalizacion del DOM element class
+	protected $_element_class = 'tdom_docbook_element';		
+	
 	public function __construct($type = 'book') {
 		#defino el doctype
 		$this->setDTD($this->_dtd, false);
@@ -45,6 +49,8 @@ class tdom_docbook extends tdom_xml {
 		$this->setPublic($this->_public);
 		#defino el tipo de documento:
 		$this->_base_node = $type;
+		#incluir el archivo de elementos de docbook
+		include_once 'tdom_docbook_element.php';
 		parent::__construct();
 		$this->standalone = 'no';
 		$this->_base = $this->element($type);

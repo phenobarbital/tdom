@@ -22,6 +22,7 @@ class tdom_svg extends tdom_xml {
 		
 	#tipo de documento (xml)
 	protected $_dom_type = 'xml';
+	protected $_mime = 'image/svg+xml';
 
 	#nombre del nodo base
 	protected $_base_node = 'svg';

@@ -85,6 +85,15 @@ class tdom_element extends DOMElement implements Iterator, Countable {
 			return $this->appendChild(new $this->_classname($node, $value, $uri));
 		}
 	}
+	
+	public function replace($node, $text = null, $uri = null, $before = false) {
+		$nodelist = $this->getElementsByTagNameNS($uri, $node);
+		#si el nodo existe, debemos eliminarlo:
+		if (!empty($nodelist) && $nodelist->length == 1) {
+			$this->delete($nodelist->item(0));
+		}
+		$this->create($node, $text, $uri, $before);
+	}
 
 	/**
 	 * adjunta un nodo ya existente
@@ -779,6 +788,21 @@ class tdom_element extends DOMElement implements Iterator, Countable {
 	 */
 	public function __isset($name) {
 		return $this->hasAttribute($name);
+	}
+	
+	/**
+	 * Determinar si un elemento hijo existe dentro de este elemento
+	 *
+	 * @param string $name
+	 * @return boolean exists
+	 */
+	public function exists($name) {
+		$nodelist = $this->getElementsByTagName($name);
+		if (!empty($nodelist) && $nodelist->count > 0) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**

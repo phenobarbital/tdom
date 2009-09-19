@@ -20,6 +20,7 @@ class tdom_xml extends DOMDocument  implements Iterator, Countable {
 
 	//atributos:
 	protected $_dom_type = 'xml';
+	protected $_mime = 'application/xml';
 
 	#nombre del nodo base
 	protected $_base_node = '';
@@ -207,7 +208,7 @@ class tdom_xml extends DOMDocument  implements Iterator, Countable {
 	/**
 	 * devuelve la base del documento
 	 *
-	 * @return tdom_xml document
+	 * @return tdom_xml_element element
 	 */
 	public function base() {
 		return $this->documentElement;
@@ -263,6 +264,15 @@ class tdom_xml extends DOMDocument  implements Iterator, Countable {
 	}
 
 	// --- visualizacion del documento
+	
+	/**
+	 * Retorna el tipo MIME declarado para el documento
+	 *
+	 * @return string $mime
+	 */
+	public function mime() {
+		return $this->_mime;
+	}
 
 	/**
 	 * valida el documento actual
