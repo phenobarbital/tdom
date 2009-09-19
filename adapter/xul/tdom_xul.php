@@ -12,6 +12,7 @@ class tdom_xul extends tdom_xml {
 	public $_stylesheet = 'chrome://global/skin/xul.css';
 	
 	protected $_dom_type = 'xml';
+	protected $_mime = 'application/vnd.mozilla.xul+xml';
 	
 	/**
 	 * objeto base window

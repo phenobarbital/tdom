@@ -18,6 +18,7 @@ class tdom_html extends tdom_xml {
 	protected $_public = '-//W3C//DTD XHTML 1.0 Strict//EN';
 
 	protected $_dom_type = 'html';
+	protected $_mime = 'application/xhtml+xml';
 
 	#nombre del nodo base
 	protected $_base_node = 'html';
@@ -238,8 +239,8 @@ class tdom_html extends tdom_xml {
 		return $this->meta('keywords', $keys);
 	}
 
-	public function meta_revised($autor = '') {
-		return $this->meta('Revised', $autor . ': ' . date ('M d Y'));
+	public function meta_revised() {
+		return $this->meta('Revised', date (DATE_RFC822));
 	}
 
 	public function meta_abstract($value = '') {

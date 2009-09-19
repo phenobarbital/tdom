@@ -22,6 +22,7 @@ class tdom_rss extends tdom_xml {
 
 	#tipo de documento (xml)
 	protected $_dom_type = 'xml';
+	protected $_mime = 'application/rss+xml';
 
 	#nombre del nodo base
 	protected $_base_node = 'rss';
