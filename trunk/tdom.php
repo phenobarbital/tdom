@@ -43,13 +43,7 @@ class tdom {
 		}
 	}
 
-	/**
-	 * Determina el tipo de documento que va a generar el objeto DOM
-	 *
-	 * @param string $doctype
-	 * @return tdom_xml adapter
-	 */
-	public function type($doctype = 'xml') {
+	protected static function _create($doctype = 'xml') {
 		#comprobamos inicialmente la existencia del adaptador
 		$dir = TDOM_BASE . 'adapter' . DIRECTORY_SEPARATOR . $doctype . DIRECTORY_SEPARATOR;
 		$classname = 'tdom_' . $doctype;
@@ -58,8 +52,7 @@ class tdom {
 			if (is_file($filename)) {
 				require_once($filename);
 				if (class_exists($classname, false)) {
-					$this->_doc = new $classname();
-					return $this->_doc;
+					return new $classname();
 				} else {
 					throw new exception("tdom error: la clase {$classname} para el tipo de documento {$doctype} no existe!");
 				}
@@ -69,6 +62,20 @@ class tdom {
 		} else {
 			throw new exception("tdom error: el directorio {$dir} no existe");
 		}
+	}
+	/**
+	 * Determina el tipo de documento que va a generar el objeto DOM
+	 *
+	 * @param string $doctype
+	 * @return tdom_xml adapter
+	 */
+	public function type($doctype = 'xml') {
+		$this->_doc = self::_create($doctype);
+		return $this->_doc;
+	}
+
+	public static function document($doctype = 'xml') {
+		return self::_create($doctype);
 	}
 
 	/**
@@ -99,7 +106,7 @@ class tdom {
 	public function __call($method, $args) {
 		return call_user_func_array(array($this->_doc, $method), $args);
 	}
-	
+
 	public function version() {
 		return TDOM_VERSION;
 	}
