@@ -109,7 +109,7 @@ class tdom_xml extends DOMDocument  implements Iterator, Countable {
 		}
 		return $this;
 	}
-	
+
 	public function useDTD($val = true) {
 		$this->use_dtd = $val;
 		return $this;
@@ -126,7 +126,7 @@ class tdom_xml extends DOMDocument  implements Iterator, Countable {
 		}
 		return $this;
 	}
-	 
+
 	public function setNamespace($name = '') {
 		$this->_namespace = $name;
 		return $this;
@@ -226,7 +226,7 @@ class tdom_xml extends DOMDocument  implements Iterator, Countable {
 		$element = new $this->_element_class($node_name, $value, $uri);
 		return $this->documentElement->appendNode($element);
 	}
-	
+
 	/**
 	 * Permite crear instrucciones de procesado, como xsl-stylesheet
 	 *
@@ -238,7 +238,7 @@ class tdom_xml extends DOMDocument  implements Iterator, Countable {
 		$element = $this->createProcessingInstruction($target, $data);
 		return $this->appendChild($element);
 	}
-	
+
 	/**
 	 * Permite crear secciones CDATA
 	 *
@@ -427,6 +427,45 @@ class tdom_xml extends DOMDocument  implements Iterator, Countable {
 			}
 		} else {
 			throw new exception('TDOM XML: debe especificar un nombre de elemento');
+		}
+	}
+
+	/**
+	 * Permite hacer busquedas de elementos definiendo el namespace
+	 *
+	 * @param string $name
+	 * @param string $uri namespace
+	 * @param integer $item
+	 * @return tdom_node DOMNodelist
+	 */
+	public function elementNS($name, $uri = '', $item = null) {
+		$n = null;
+		$this->validate();
+		if ($name) {
+			$node = $this->getElementsByTagNameNS('*', $name);
+			if (!empty($node) && $node->length > 0) {
+				if (is_null($item)) {
+					if ($node->length == 1) {
+						#como no hay 2 items, devuelvo el unico que existe
+						$n = $node->item(0);
+					} else {
+						#hay muchos nodos, devuelvo el nodelist
+						$n = $node;
+					}
+				} else {
+					switch($item) {
+						case 0:
+						case '':
+							$n = $node->item(0);
+							break;
+						default:
+							$n = $node->item($item);
+					}
+				}
+			}
+			return $n;
+		} else {
+			return false;
 		}
 	}
 

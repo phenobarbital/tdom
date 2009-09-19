@@ -8,6 +8,7 @@ define('XML_ENCODING', 'utf-8');
 define('STANDALONE', false); #required for some applications
 define('XML_STRICT', true); #xhtml 1.0 strict or xhtml transitional?
 define('XML_LANG', 'es'); #lenguaje para el constructor xhtml
+define('XML_LOCALE', 'es_VE');
 define('XML_FORMAT', true); #permite formatear la salida del DOM
 #propiedades relativas al URI
 define('XML_HTTP_PORT', ''); #puerto, cambiar si es distinto de 80 (ej. :8080)

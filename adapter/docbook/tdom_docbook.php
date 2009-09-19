@@ -7,7 +7,7 @@
  * @author Jesús Lara <jesuslarag@gmail.com>
  **/
 class tdom_docbook extends tdom_xml {
-	#dtd SVG
+	#dtd Docbook
 	public $_dtd = 'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd';
 
 	#espacio xml
