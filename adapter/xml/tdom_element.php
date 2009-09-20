@@ -395,17 +395,22 @@ class tdom_element extends DOMElement implements Iterator, Countable {
 		}
 	}
 
+	/**
+	 * Retorna un elemento basado en su ID (nombre o identificador)
+	 *
+	 * @param string $name
+	 * @return tdom_element node
+	 */
 	public function get($name) {
 		if ($name) {
 			$node = $this->ownerDocument->getElementById($name);
 			if ($node) {
 				return $node;
 			} else {
-				throw new exception("Debe especificar un nombre de nodo valido: {$name} no existe");
 				return false;
 			}
 		} else {
-			throw new exception("debe especificar un nombre de nodo valido");
+			throw new exception("tdom_element: debe especificar un nombre de nodo valido");
 		}
 	}
 
@@ -514,7 +519,11 @@ class tdom_element extends DOMElement implements Iterator, Countable {
 		return parent::getAttribute($name);
 	}
 
-	#identifica el id del documento
+	/**
+	 * identifica del elemento (unique identification)
+	 * @return tdom_element this
+	 */
+	
 	public function id($id) {
 		$this->setAttribute('id', $id);
 		$this->setIdAttribute('id', true);
