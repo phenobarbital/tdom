@@ -57,10 +57,14 @@ class tdom_element extends DOMElement implements Iterator, Countable {
 	/**
 	 * retorna el documento propietario del elemento actual
 	 *
-	 * @return DOMDocument
+	 * @return tdom_xml
 	 */
 	public function document() {
 		return $this->ownerDocument;
+	}
+	
+	public function __toString() {
+		return $this->ownerDocument->saveXML($this, LIBXML_NOXMLDECL+LIBXML_NOCDATA+LIBXML_NOBLANKS+LIBXML_NSCLEAN|LIBXML_NONET|LIBXML_DTDLOAD|LIBXML_DTDVALID);
 	}
 
 	// -- insercion y creacion de objetos:
@@ -84,6 +88,13 @@ class tdom_element extends DOMElement implements Iterator, Countable {
 		} else {
 			return $this->appendChild(new $this->_classname($node, $value, $uri));
 		}
+	}
+	
+	public function createinx($node, $text = null, $uri = null, $before = false) {
+		if (!$e = $this->element($node)) {
+			$e = $this->create($node, $text, $uri, $before);
+		}
+		return $e;
 	}
 	
 	public function replace($node, $text = null, $uri = null, $before = false) {
@@ -224,10 +235,27 @@ class tdom_element extends DOMElement implements Iterator, Countable {
 			return false;
 		}
 	}
-
-	// --- metodo generico add, permite adjuntar cualquier cosa (simplemente evalua y delega)
-	public function add($data, $is_file = false) {
-
+	
+	/**
+	 * Agrega un nodo especial al elemento actual
+	 *
+	 * @param $node
+	 * @param boolean $before
+	 * @return DOMNode $node
+	 */
+	public function add($node, $before = false) {
+		if (is_subclass_of($node, 'DOMDocument')) {
+			#el elemento base lo importo
+			$node = $node->documentElement;
+			$node = $this->ownerDocument->importNode($node, true);
+		}
+		if ($before == false) {
+			$node = $this->appendChild($node);
+		} else {
+			$node = $this->insertBefore($node, $this->childNodes->item(0));
+		}
+		$this->ownerDocument->validate();
+		return $node;
 	}
 	 
 	// --- metodo attach, permite adjuntar y elemento especial html (div, img, tables, forms, form elements, widgets, etc)
@@ -282,9 +310,15 @@ class tdom_element extends DOMElement implements Iterator, Countable {
 		}
 	}
 
+	/**
+	 * Retorna el nodo padre actual del elemento
+	 *
+	 * @return tdom_element
+	 */
 	public function parent() {
 		return $this->parentNode;
 	}
+
 
 	//TODO: implementar
 	public function moveNodes($origin) {
@@ -468,6 +502,10 @@ class tdom_element extends DOMElement implements Iterator, Countable {
 		$this->nodeValue = $value;
 		return $this;
 	}
+	
+	public function getValue() {
+		return $this->nodeValue;
+	}
 
 	public function comment($comentario='') {
 		$this->appendChild(new DOMComment($comentario));
@@ -572,6 +610,7 @@ class tdom_element extends DOMElement implements Iterator, Countable {
 	public function rewind() {
 		return $this->first();
 	}
+	
 	#retorna el anterior hijo desde el actual
 	public function previous(){
 		if ($this->_item) {
@@ -738,12 +777,7 @@ class tdom_element extends DOMElement implements Iterator, Countable {
 	 * @return tdom_element this
 	 */
 	public function __set($name, $value) {
-		try {
-			$this->setAttribute($name, $value);
-		} catch (exception $e) {
-			echo $e->getMessage();
-		}
-		return $this;
+		$this->setAttribute($name, $value);
 	}
 
 	/**
@@ -765,28 +799,33 @@ class tdom_element extends DOMElement implements Iterator, Countable {
 	 *
 	 * @return string element
 	 */
-	public function __toString() {
+	public function content() {
 		return $this->textContent;
 	}
 
-	// --- metodo magico para sobre-escribir la creacion de atributos en el elemento actual:
+	// --- metodo magico para sobre-escribir la busqueda o creacion de elementos en el elemento actual:
 	 
 	/**
-	 * generar atributos de la forma $element->attribute('value')
+	 * permite obtener un item de un nodelist de elementos usando notacion de funcion
 	 *
-	 * @param string $method nombre de atributo
-	 * @param string $value valor de atributo
-	 * @return tdom_element object
+	 * @param string $method
+	 * @param array $args
+	 * @return $this
 	 */
-	public function __call($method, $value) {
-		if (isset($value[0])) {
-			try {
-				$this->setAttribute($method, $value[0]);
-			} catch (exception $e) {
-				$e->exception_error();
-			}
+	public function __call($method, $args) {
+		if ($args) {
+			#retorna el elemento indicado por args
+			$id = $args[0];
+		} else {
+			$id = null;
 		}
-		return $this;
+		$element = $this->element($method, $id);
+		if ($element == false) {
+			//TODO: deberiamos crear el elemento
+			return false;
+		} else {
+			return $element;
+		}
 	}
 
 	/**
@@ -807,7 +846,7 @@ class tdom_element extends DOMElement implements Iterator, Countable {
 	 */
 	public function exists($name) {
 		$nodelist = $this->getElementsByTagName($name);
-		if (!empty($nodelist) && $nodelist->count > 0) {
+		if (!empty($nodelist) && $nodelist->length > 0) {
 			return true;
 		} else {
 			return false;

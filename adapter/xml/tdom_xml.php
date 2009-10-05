@@ -222,10 +222,10 @@ class tdom_xml extends DOMDocument  implements Iterator, Countable {
 	 * @param string $uri namespace
 	 * @return unknown
 	 */
-	public function createNode($node_name, $value = null, $uri = null) {
+	public function createNode($node_name, $value = null, $uri = null, $before = false) {
 		//var_dump($this->_element_class);
 		$element = new $this->_element_class($node_name, $value, $uri);
-		return $this->documentElement->appendNode($element);
+		return $this->documentElement->appendNode($element, $before);
 	}
 
 	/**
@@ -261,6 +261,13 @@ class tdom_xml extends DOMDocument  implements Iterator, Countable {
 	 */
 	public function create($nodename, $value = null, $uri = null) {
 		return $this->createNode($nodename, $value, $uri);
+	}
+	
+	public function createinx($node, $value = null, $uri = null, $before = false) {
+		if(!$e = $this->getElementsByTagName($node)->item(0)) {
+			$e = $this->createNode($node, $value, $uri, $before);
+		}
+		return $e;
 	}
 
 	// --- visualizacion del documento
@@ -708,45 +715,40 @@ class tdom_xml extends DOMDocument  implements Iterator, Countable {
 
 
 	// --- operaciones de carga:
-
 	/**
-	 * operacion para cargar desde un archivo o recurso URL
+	 * Abre un archivo dentro del objeto XML de manera generica
 	 *
-	 * @param string $filename
-	 * @param boolean $xinclude procesa las directivas xinclude
+	 * @param string $filename archivo a abrir
+	 * @param string $process_includes ejecuta la operacion XInclude declaradas en el archivo
 	 * @return boolean
 	 */
-	public function load($filename, $xinclude = false) {
-		if (is_file($filename)) {
-			#creo el parser DOM local
-			$dom = $this->createDOM();
+	public function open($filename, $process_includes = true) {
+		if (is_file($filename) && is_readable($filename)) {
 			#limpia cualquier espacio en blanco innecesario
-			$dom->preserveWhiteSpace = false;
+			$this->preserveWhiteSpace = false;
 			#intenta reparar etiquetas mal formadas o ausentes
-			$dom->normalizeDocument = false;
+			$this->normalizeDocument = true;
 			#hace que el parser sea estricto en el chequeo del archivo
-			$dom->strictErrorChecking = false;
+			$this->strictErrorChecking = true;
 			#indico la base de cualquier posible xinclude
-			$dom->documentURI = $filename;
-			#lo cargo como xml (puede dar error si el archivo esta mal parseado):
-			$dom->load($filename, LIBXML_NOERROR);
-			//LIBXML_NOBLANKS+LIBXML_NOENT+LIBXML_NONET+LIBXML_NOCDATA
-			if ($xinclude) {
-				$dom->xinclude();
-			}
-			#si ha cargado, entonces lo adjunto al elemento actual
-			#ahora si puedo cargarlo como XML valido:
-			foreach($dom->childNodes as $node) {
-				$doc = $this->importNode($node, true);
-				if ($doc) {
-					$node = $this->appendChild($doc);
+			$this->documentURI = $filename;
+			#validar la carga:
+			$this->validateOnParse = true;
+			if ($this->load($filename, LIBXML_NOERROR+LIBXML_NODTD+LIBXML_NOBLANKS+LIBXML_NOENT+LIBXML_NONET)) {
+				#ejecuto cualquier operacion de XINCLUDE
+				if ($process_includes == true) {
+					$this->xinclude();
 				}
+				return true;
+			} else {
+				#emitir el error generado
+				return false;
 			}
-			return true;
 		} else {
+			throw new exception('tdom file: archivo no existe');
 			return false;
 		}
-	}
+	}	
 
 	#gestion de carga de archivos
 
