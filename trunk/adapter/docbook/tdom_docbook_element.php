@@ -179,6 +179,28 @@ class docbook_element extends tdom_element {
 		}
 	}
 
+	public function section($id = '', $title = '') {
+		$chapter = null;
+		if ($this->validParent($this->nodeName, array('article', 'chapter', 'section', 'appendix'))) {
+			foreach($this->getElementsByTagName('section') as $node) {
+				if ($node->getAttribute('id') == $id || $node->getAttribute('label')==$id) {
+					$section = $node;
+					break;
+				}
+			}
+			#si de cualquier manera, la seccion no existe, se crea:
+			if ($section == null) {
+				$section = $this->create('section');
+				$section->id($id);
+				$section->label($id);
+				$section->create('title')->value($title);
+			}
+			return $section;
+		} else {
+			return false;
+		}
+	}
+
 	public function preface($label, $title = '') {
 		if ($this->validParent($this->nodeName, array('book'))) {
 			if ($preface = $this->getElementsByTagName('preface')->item(0)) {
@@ -290,7 +312,7 @@ class db_biblioentry extends tdom_xml {
 		$r->createinx('holder', $name);
 		return $r;
 	}
-	
+
 	public function createAuthor($name, $surname) {
 		return $this->authorgroup()->add(new db_author($name, $surname));
 	}
